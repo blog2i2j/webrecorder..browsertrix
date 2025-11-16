@@ -1346,7 +1346,7 @@ class CrawlOperator(BaseOperator):
 
     async def get_redis_crawl_stats(
         self, redis: Redis, crawl_id: str
-    ) -> tuple[CrawlStats, dict[str, int]]:
+    ) -> tuple[CrawlStats, dict[str, str]]:
         """get page stats"""
         try:
             # crawler >0.9.0, done key is a value
@@ -1376,10 +1376,11 @@ class CrawlOperator(BaseOperator):
         return stats, sizes
 
     def handle_resize_pvc_storage(
-        self, status: CrawlStatus, sizes: dict[str, int], data: MCSyncData
+        self, status: CrawlStatus, sizes: dict[str, str], data: MCSyncData
     ):
         """check if pvc storage may need to be resized, and if so, update newStorage to indicate"""
-        for key, used_storage in sizes.items():
+        for key, used in sizes.items():
+            used_storage = int(used)
             if used_storage > 0 and status.podStatus:
                 pod_info = status.podStatus[key]
 
